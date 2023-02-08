@@ -25,30 +25,39 @@ async function onSearch(e) {
   form.reset();
 }
 
-function onLoadMore() {
-  getQuery();
-  // if( api.searchQuery.hits.length = api.searchQuery.total){
-  //   Notiflix.Notify.info(
-  //     'Sorry, there are no images matching your search query. Please try again.'
-  //   )
-  // }
+async function onLoadMore() {
+  // const hits = await api.fetchQuery();
+  const hits = await getQuery();
+  // getQuery();
+  // console.log(hits)
+  if (api.perPage * api.queryPage >= hits.numberOfTotalHits) {
+    loadMoreBtn.hide();
+    Notiflix.Notify.info(
+      "We're sorry, but you've reached the end of search results."
+    );
+  }
 }
 
 async function getQuery() {
   try {
     const hits = await api.fetchQuery();
 
-    if (hits === undefined || hits.length === 0) {
+    if (hits.arrayOfhits === undefined || hits.arrayOfhits.length === 0) {
       loadMoreBtn.hide();
       throw new Error();
     }
 
-    const markUp = await hits.reduce(
+    const markUp = await hits.arrayOfhits.reduce(
       (markUp, hit) => createPhotoCard(hit) + markUp,
       ''
     );
     loadMoreBtn.show();
+    if (hits.numberOfTotalHits <= api.perPage) {
+      loadMoreBtn.hide();
+    }
+
     gallery.insertAdjacentHTML('beforeend', markUp);
+    return hits;
   } catch (error) {
     Notiflix.Notify.failure(
       'Sorry, there are no images matching your search query. Please try again.'
