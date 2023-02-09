@@ -26,11 +26,9 @@ async function onSearch(e) {
 }
 
 async function onLoadMore() {
-  // const hits = await api.fetchQuery();
   const hits = await getQuery();
-  // getQuery();
-  // console.log(hits)
-  if (api.perPage * api.queryPage >= hits.numberOfTotalHits) {
+
+  if (api.perPage * (api.queryPage - 1) >= hits.numberOfTotalHits) {
     loadMoreBtn.hide();
     Notiflix.Notify.info(
       "We're sorry, but you've reached the end of search results."
